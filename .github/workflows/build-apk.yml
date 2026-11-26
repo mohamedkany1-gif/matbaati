@@ -28,7 +28,7 @@ jobs:
           cd build
           npm init -y
           npm i --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/filesystem@6 @capacitor/share@6
-          npx cap init "matbaati" com.matbaati.app --web-dir=www
+          npx cap init "Matbaati" com.matbaati.app --web-dir=www
           npx cap add android
           npx cap sync android
           rm -rf android/app/src/main/res/mipmap-anydpi-v26
@@ -69,5 +69,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: apk-${{ github.run_number }}
-          name: مطبعتي APK ${{ github.run_number }}
+          name: Matbaati APK ${{ github.run_number }}
           files: matbaati.apk
