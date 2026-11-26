@@ -13,8 +13,8 @@
 :root{--t:#0e7c86;--t2:#16a5a0;--p:#e5368a;--y:#f2c200;--k:#1b1b1b;--bg:#eaf5f5;--ink:#0b3b40}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Kufi Arabic','Segoe UI',Tahoma,Arial,sans-serif}
-#app{max-width:480px;margin:0 auto;min-height:100vh;padding:18px 16px 96px}
-.top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+#app{max-width:480px;margin:0 auto;min-height:100vh;padding:26px 22px 96px}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 .lg{width:46px;height:46px;border-radius:14px;background:var(--t);color:#fff;font-weight:900;font-size:30px;display:flex;align-items:center;justify-content:center;flex:none}
 .ti{font-size:22px;font-weight:800;flex:1}.sub{font-size:13px;opacity:.65;font-weight:400;display:block}
 .ib{width:42px;height:42px;border-radius:14px;border:0;background:#fff;color:var(--ink);display:flex;align-items:center;justify-content:center;flex:none}
@@ -33,8 +33,8 @@ input,textarea{width:100%;border:2px solid transparent;background:#fff;border-ra
 input:focus,textarea:focus{border-color:var(--t)}
 .fab{position:fixed;bottom:84px;left:18px;width:58px;height:58px;border-radius:20px;border:0;background:var(--p);color:#fff;box-shadow:0 6px 18px #0003;display:flex;align-items:center;justify-content:center;z-index:5}
 .fab svg{width:30px;height:30px;stroke-width:2.6}
-.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;display:flex;justify-content:space-around;padding:8px 0 calc(10px + env(safe-area-inset-bottom));z-index:6;box-shadow:0 -2px 12px #0001}
-.nav a{display:flex;flex-direction:column;align-items:center;font-size:12px;color:#6a8a8d;text-decoration:none;gap:2px;flex:1}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;display:flex;justify-content:space-around;padding:12px 0 calc(16px + env(safe-area-inset-bottom));z-index:6;font-size:12px}
+.nav a{display:block;text-align:center;font-size:12px;color:var(--ink);text-decoration:none}.nav a span{display:block;font-size:20px}
 .nav a.on{color:var(--t);font-weight:800}
 .btn{width:100%;border:0;border-radius:16px;padding:15px;font-size:17px;font-weight:800;font-family:inherit;background:var(--t);color:#fff;margin-top:10px}
 .btn.p{background:var(--p)}.btn.del{background:#fff;color:#c0262d;border:2px solid #f3c9cc}.btn.w{background:#fff;color:var(--t)}
@@ -56,14 +56,25 @@ label{display:block;font-size:14px;font-weight:700;margin:10px 2px}label>input,l
 .chips svg{width:18px;height:18px}
 .x{border:0;background:none;color:#c0262d;font-size:13px;font-family:inherit;padding:6px}
 .ban{background:#fff7d6;border-radius:16px;padding:12px 14px;font-size:14px;margin-bottom:12px}
+.hm .top{margin-bottom:16px}.hm .lg{cursor:pointer}.hm .t{font-size:24px;font-weight:800}.hm .h{font-size:13px;opacity:.65}
+.hm .big b{margin:0}
+.hm .tile{padding:18px 14px;min-height:112px;border-radius:22px;font-size:17px;align-items:stretch}.hm .tile .ic{font-size:32px}.hm .g{margin-bottom:0}
+.hm .row{padding:12px 14px;font-size:14px;margin-top:10px}.hm .row b{font-weight:700}
+.lw{display:flex;flex-direction:column;align-items:center;margin-top:64px}.lw .lgo{width:110px;height:110px;border-radius:30px;background:var(--t);color:#fff;font-weight:900;font-size:70px;display:flex;align-items:center;justify-content:center}
+.lw .lt{font-size:34px;font-weight:800;margin-top:14px}.lw .lh{font-size:13px;opacity:.65;margin-bottom:40px}
+.lw form{width:100%}.lw input{border:0;border-radius:18px;padding:16px;font-size:15px;opacity:.9;margin-bottom:12px;text-align:right}
+.lw input::placeholder{color:var(--ink);opacity:1}.lw .f1{border-right:6px solid var(--t)}.lw .f2{border-right:6px solid var(--p);margin-bottom:22px}
+.lw .lb{width:100%;background:var(--t);color:#fff;border:0;border-radius:18px;padding:16px;text-align:center;font-weight:800;font-size:18px;font-family:inherit}
+.lw .err{margin:0;min-height:0}.lw .forgot{font-size:13px;opacity:.65;margin-top:18px}.lw .dots{display:flex;gap:8px;margin-top:60px}.lw .dots b{width:14px;height:14px;border-radius:50%}
 </style>
 </head>
 <body>
 <div id="app"><div class="empty" id="ld">جاري التحميل…</div></div>
 <div id="modal"></div>
 <script>
+window.addEventListener('unhandledrejection',function(e){window.onerror(String((e.reason&&e.reason.message)||e.reason),'app.js',0)});
 window.onerror=function(m,u,l){var a=document.getElementById('app');if(a)a.innerHTML='<div class="empty" style="direction:ltr;text-align:left">حصل خطأ في البرنامج. صوّر الشاشة وابعتها:<br><br>'+String(m).replace(/</g,'&lt;')+'<br>'+String(u).split('/').pop()+':'+l+'</div>'};
-setTimeout(function(){if(document.getElementById('ld'))document.getElementById('app').innerHTML='<div class="empty">الصفحة مفتحتش كويس. اتأكد إن كل ملفات فولدر site (خصوصًا app.js و supabase.min.js) في نفس الفولدر، وجرّب متصفح كروم.</div>'},4000);
+window.ldT=setTimeout(function(){if(document.getElementById('ld'))document.getElementById('app').innerHTML='<div class="empty">الصفحة مفتحتش كويس. اتأكد إن كل ملفات فولدر site (خصوصًا app.js و supabase.min.js) في نفس الفولدر، وجرّب متصفح كروم.</div>'},4000);
 </script>
 <script src="supabase.min.js"></script>
 <script src="app.js"></script>
