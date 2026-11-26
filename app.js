@@ -1,5 +1,5 @@
-/* مطبعتي v1.0.3 */
-const APP_VERSION = '1.0.3';
+/* مطبعتي v1.0.5 */
+const APP_VERSION = '1.0.5';
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt = n => Number(n || 0).toLocaleString('en-US', {maximumFractionDigits: 2});
@@ -19,7 +19,7 @@ const IC = {
 };
 const svg = n => `<svg viewBox="0 0 24 24">${IC[n]}</svg>`;
 
-let READY = false, sb = null, S = {items:[], customers:[], places:[], ledger:[]}, Q = '';
+let MUT = 0, BM = null, READY = false, sb = null, S = {items:[], customers:[], places:[], ledger:[]}, Q = '';
 
 /* ---------- data ---------- */
 /* بيانات الاتصال (مفتاح publishable عام بطبيعته، والأمان من قواعد RLS في قاعدة البيانات) */
@@ -35,10 +35,18 @@ async function fetchAll(t) {
     from += 1000;
   }
 }
+const CK = 'mt_cache_v1';
+function saveCache() { try { localStorage.setItem(CK, JSON.stringify(S)); } catch (e) {} }
+function loadCache() {
+  try { const c = JSON.parse(localStorage.getItem(CK) || 'null'); if (c && c.items && c.customers && c.places && c.ledger) { S = c; BM = null; return true; } } catch (e) {}
+  return false;
+}
 async function loadAll() {
-  if (DEMO) { S = demoData(); return; }
+  if (DEMO) { S = demoData(); BM = null; return; }
+  const m0 = MUT;
   const r = await Promise.all(['items', 'customers', 'places', 'ledger'].map(fetchAll));
-  S = {items: r[0], customers: r[1], places: r[2], ledger: r[3]};
+  if (m0 !== MUT) return;
+  S = {items: r[0], customers: r[1], places: r[2], ledger: r[3]}; BM = null; saveCache();
 }
 async function mut(t, op, row, id) {
   if (DEMO) {
@@ -48,10 +56,11 @@ async function mut(t, op, row, id) {
     else { S[t] = a.filter(x => x.id !== id); if (t === 'customers') S.ledger = S.ledger.filter(x => x.customer_id !== id); }
     render(); return;
   }
-  const q = sb.from(TBL[t]);
-  const {error} = op === 'ins' ? await q.insert(row) : op === 'upd' ? await q.update(row).eq('id', id) : await q.delete().eq('id', id);
-  if (error) throw error;
-  await loadAll(); render();
+  const q = sb.from(TBL[t]); MUT++;
+  if (op === 'ins') { const {data, error} = await q.insert(row).select().single(); if (error) throw error; S[t].unshift(data); }
+  else if (op === 'upd') { const {data, error} = await q.update(row).eq('id', id).select().single(); if (error) throw error; const i = S[t].findIndex(x => x.id === id); if (i >= 0) S[t][i] = data; }
+  else { const {error} = await q.delete().eq('id', id); if (error) throw error; S[t] = S[t].filter(x => x.id !== id); if (t === 'customers') S.ledger = S.ledger.filter(x => x.customer_id !== id); }
+  BM = null; saveCache(); render();
 }
 function errMsg(x) {
   const m = (x && x.message) || '';
@@ -63,7 +72,10 @@ const normNum = s => String(s == null ? '' : s).replace(/[٠-٩]/g, d => '٠١٢
 function num(s) { const v = Number(normNum(s)); if (!isFinite(v) || normNum(s) === '') throw new Error('اكتب رقم صحيح'); return v; }
 const today = () => new Date().toISOString().slice(0, 10);
 
-function balance(cid) { return S.ledger.filter(e => e.customer_id === cid).reduce((a, e) => a + (e.kind === 'debit' ? 1 : -1) * Number(e.amount), 0); }
+function balance(cid) {
+  if (!BM) { BM = {}; S.ledger.forEach(e => { BM[e.customer_id] = (BM[e.customer_id] || 0) + (e.kind === 'debit' ? 1 : -1) * Number(e.amount); }); }
+  return BM[cid] || 0;
+}
 function totals() {
   let debt = 0, cnt = 0, credit = 0;
   S.customers.forEach(c => { const b = balance(c.id); if (b > 0) { debt += b; cnt++; } else if (b < 0) credit += -b; });
@@ -77,14 +89,14 @@ function head(title, sub, opts = {}) {
 }
 function nav(v) {
   const L = [['home', 'الرئيسية', '⌂'], ['items', 'الأصناف', '▤'], ['customers', 'العملاء', '☻'], ['accounts', 'الحسابات', '💰']];
-  return `<div class="nav">${L.map(l => `<a href="#/${l[0]}" class="${v !== 'home' && (v === l[0] || (v === 'c' && l[0] === 'accounts')) ? 'on' : ''}"><span>${l[2]}</span>${l[1]}</a>`).join('')}</div>`;
+  return `<div class="nav">${L.map(l => `<a href="#/${l[0]}" class="${v === l[0] || (v === 'c' && l[0] === 'accounts') ? 'on' : ''}"><span>${l[2]}</span>${l[1]}</a>`).join('')}</div>`;
 }
 function searchBox(ph) { return `<div class="sr"><input id="q" placeholder="${ph}" value="${esc(Q)}" autocomplete="off"></div>`; }
 
 function pageHome() {
   const t = totals();
   const top = S.customers.map(c => ({c, b: balance(c.id)})).filter(x => x.b !== 0).sort((a, b) => Math.abs(b.b) - Math.abs(a.b)).slice(0, 2);
-  return `<div class="hm"><div class="top"><div class="lg" data-act="settings">م</div><div><div class="t">مطبعتي</div><div class="h">أهلاً يا معلم</div></div></div>
+  return `<div class="hm"><div class="top"><div class="lg" data-act="settings">م</div><div style="flex:1"><div class="t">مطبعتي</div><div class="h">أهلاً يا سارة</div></div><button class="ib" data-act="settings">${svg('gear')}</button></div>
     <div class="big"><div style="font-size:14px">إجمالي الديون الخارجية</div><b>${fmt(t.debt)} ج</b><div style="font-size:13px">${t.cnt} عميل عليهم مبالغ</div></div>
     <div class="g">
     <button class="tile" style="border-top-color:var(--t)" data-go="items"><span class="ic">▤</span>الأصناف<small>الأسعار والتفاصيل</small></button>
@@ -139,6 +151,7 @@ function pageCustomer(id) {
 }
 
 function render() {
+  BM = null;
   const r = (location.hash || '#/').slice(2).split('/');
   const v = r[0] || 'home';
   const pages = {home: pageHome, items: pageItems, customers: pageCustomers, places: pagePlaces, accounts: pageAccounts, c: () => pageCustomer(r[1])};
@@ -154,6 +167,24 @@ function redrawList() {
 }
 
 /* ---------- forms ---------- */
+function dlg(msg, ok, cancel, danger) {
+  return new Promise(res => {
+    let d = document.getElementById('dlg');
+    if (!d) { d = document.createElement('div'); d.id = 'dlg'; document.body.appendChild(d); }
+    const e = s => String(s).replace(/[&<>]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c]));
+    d.innerHTML = `<div class="dbox"><div class="dm">${e(msg)}</div><div class="dbt">${cancel ? `<button type="button" class="dc" data-r="0">${cancel}</button>` : ''}<button type="button" class="dok${danger ? ' dd' : ''}" data-r="1">${ok}</button></div></div>`;
+    d.className = 'on';
+    d.onclick = ev => {
+      const b = ev.target.closest('button[data-r]');
+      if (!b && ev.target !== d) return;
+      ev.stopPropagation();
+      d.className = ''; d.innerHTML = '';
+      res(!!b && b.dataset.r === '1');
+    };
+  });
+}
+const askC = (m, ok) => dlg(m, ok || 'تأكيد', 'إلغاء', true);
+const tell = m => dlg(m, 'تمام', null, false);
 function closeModal() { $('#modal').classList.remove('on'); $('#modal').innerHTML = ''; }
 function form(title, fields, vals, onSave, onDel, btn) {
   const m = $('#modal');
@@ -165,7 +196,7 @@ function form(title, fields, vals, onSave, onDel, btn) {
     const b = e.target.querySelector('.btn'); b.disabled = true;
     try { await onSave(o); closeModal(); } catch (x) { $('#ferr').textContent = errMsg(x); b.disabled = false; }
   };
-  if (onDel) $('#fdel').onclick = async () => { if (confirm('متأكد إنك عايز تحذف؟')) { try { await onDel(); closeModal(); } catch (x) { $('#ferr').textContent = errMsg(x); } } };
+  if (onDel) $('#fdel').onclick = async () => { if (await askC('متأكد إنك عايز تحذف؟', 'احذف')) { try { await onDel(); closeModal(); } catch (x) { $('#ferr').textContent = errMsg(x); } } };
 }
 const needName = o => { if (!String(o.name || '').trim()) throw new Error('اكتب الاسم'); return String(o.name).trim(); };
 function itemForm(it) {
@@ -212,7 +243,7 @@ function backup() {
         const r = await FS.writeFile({path: fname, data: xml, directory: 'CACHE', encoding: 'utf8'});
         await SH.share({title: 'نسخة مطبعتي الاحتياطية', url: r.uri, dialogTitle: 'احفظ أو ابعت النسخة'});
         localStorage.setItem('mt_lastbackup', String(Date.now()));
-      } catch (e) { if (!/cancel/i.test(String(e && e.message || e))) alert('تعذر عمل النسخة: ' + errMsg(e)); }
+      } catch (e) { if (!/cancel/i.test(String(e && e.message || e))) tell('تعذر عمل النسخة: ' + errMsg(e)); }
     })();
     return;
   }
@@ -274,6 +305,14 @@ async function boot() {
   if (!sb) sb = supabase.createClient(c.url, c.key, {auth: {persistSession: true, autoRefreshToken: true, detectSessionInUrl: false}});
   const {data} = await sb.auth.getSession();
   if (!data.session) { loginScreen(); return; }
+  if (loadCache()) {
+    READY = true;
+    if (!location.hash) location.hash = '#/home';
+    render();
+    const m0 = MUT;
+    loadAll().then(() => { if (m0 === MUT) render(); }).catch(() => {});
+    return;
+  }
   $('#app').innerHTML = '<div class="empty">جاري التحميل…</div>';
   try { await loadAll(); } catch (e) {
     $('#app').innerHTML = `<div class="empty">${esc(errMsg(e))}<br><br><button class="btn" onclick="boot()">إعادة المحاولة</button></div>`; return;
@@ -292,7 +331,7 @@ document.addEventListener('click', async e => {
   else if (a === 'settings') settings();
   else if (a === 'backup') backup();
   else if (a === 'refresh') { await loadAll(); render(); closeModal(); }
-  else if (a === 'logout') { if (confirm('تسجيل خروج؟')) { await sb.auth.signOut(); closeModal(); boot(); } }
+  else if (a === 'logout') { { await sb.auth.signOut(); try { localStorage.removeItem(CK); } catch (e) {} closeModal(); boot(); } }
   else if (a === 'add-item') itemForm();
   else if (a === 'edit-item') itemForm(S.items.find(x => x.id === id));
   else if (a === 'add-customer') customerForm();
@@ -301,7 +340,7 @@ document.addEventListener('click', async e => {
   else if (a === 'edit-place') placeForm(S.places.find(x => x.id === id));
   else if (a === 'add-debit') entryForm(id, 'debit');
   else if (a === 'add-credit') entryForm(id, 'credit');
-  else if (a === 'del-entry') { if (confirm('حذف الحركة دي؟')) { try { await mut('ledger', 'del', null, id); } catch (x) { alert(errMsg(x)); } } }
+  else if (a === 'del-entry') { if (await askC('حذف الحركة دي؟', 'احذف')) { try { await mut('ledger', 'del', null, id); } catch (x) { tell(errMsg(x)); } } }
 });
 document.addEventListener('input', e => { if (e.target.id === 'q') { Q = e.target.value; redrawList(); } });
 window.addEventListener('hashchange', () => { Q = ''; if (READY || DEMO) render(); window.scrollTo(0, 0); });
