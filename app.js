@@ -1,9 +1,10 @@
-/* مطبعتي v1.0.1 */
-const APP_VERSION = '1.0.1';
+/* مطبعتي v1.0.2 */
+const APP_VERSION = '1.0.2';
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt = n => Number(n || 0).toLocaleString('en-US', {maximumFractionDigits: 2});
 const DEMO = /[?&]demo=1/.test(location.search);
+const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 const TBL = {items:'mt_items', customers:'mt_customers', places:'mt_places', ledger:'mt_ledger'};
 const IC = {
   home:'<path d="M3 11l9-8 9 8v10H3z"/>',
@@ -204,9 +205,21 @@ function backup() {
     sheet('الحركات', [['التاريخ', 'العميل', 'النوع', 'المبلغ', 'ملاحظة']].concat(S.ledger.map(e => [e.entry_date, nm(e.customer_id), e.kind === 'debit' ? 'دين عليه' : 'دفعة منه', Number(e.amount), e.note || ''])))
   ];
   const xml = '<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">' + sheets.join('') + '</Workbook>';
+  const fname = 'matbaati-backup-' + today() + '.xls';
+  if (NATIVE) {
+    (async () => {
+      try {
+        const FS = Capacitor.registerPlugin('Filesystem'), SH = Capacitor.registerPlugin('Share');
+        const r = await FS.writeFile({path: fname, data: xml, directory: 'CACHE', encoding: 'utf8'});
+        await SH.share({title: 'نسخة مطبعتي الاحتياطية', url: r.uri, dialogTitle: 'احفظ أو ابعت النسخة'});
+        localStorage.setItem('mt_lastbackup', String(Date.now()));
+      } catch (e) { if (!/cancel/i.test(String(e && e.message || e))) alert('تعذر عمل النسخة: ' + errMsg(e)); }
+    })();
+    return;
+  }
   const blob = new Blob([xml], {type: 'application/vnd.ms-excel'});
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download = 'matbaati-backup-' + today() + '.xls';
+  a.href = URL.createObjectURL(blob); a.download = fname;
   document.body.appendChild(a); a.click(); a.remove();
   localStorage.setItem('mt_lastbackup', String(Date.now()));
   setTimeout(() => URL.revokeObjectURL(a.href), 20000);
@@ -291,7 +304,7 @@ document.addEventListener('click', async e => {
 document.addEventListener('input', e => { if (e.target.id === 'q') { Q = e.target.value; redrawList(); } });
 window.addEventListener('hashchange', () => { Q = ''; if (READY || DEMO) render(); window.scrollTo(0, 0); });
 
-if ('serviceWorker' in navigator && !DEMO && location.protocol.startsWith('http')) {
+if ('serviceWorker' in navigator && !DEMO && !NATIVE && location.protocol.startsWith('http')) {
   const had = !!navigator.serviceWorker.controller;
   navigator.serviceWorker.register('sw.js').catch(() => {});
   navigator.serviceWorker.addEventListener('controllerchange', () => { if (had) location.reload(); });
