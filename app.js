@@ -1,5 +1,6 @@
-/* مطبعتي v1.0.18 */
-const APP_VERSION = '1.0.18';
+/* مطبعتي v1.0.20 */
+clearTimeout(window.ldT);
+const APP_VERSION = '1.0.20';
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt = n => Number(n || 0).toLocaleString('en-US', {maximumFractionDigits: 2});
