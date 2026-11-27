@@ -1,5 +1,5 @@
-/* مطبعتي v1.0.5 */
-const APP_VERSION = '1.0.5';
+/* مطبعتي v1.0.9 */
+const APP_VERSION = '1.0.9';
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt = n => Number(n || 0).toLocaleString('en-US', {maximumFractionDigits: 2});
@@ -25,11 +25,18 @@ let MUT = 0, BM = null, READY = false, sb = null, S = {items:[], customers:[], p
 /* بيانات الاتصال (مفتاح publishable عام بطبيعته، والأمان من قواعد RLS في قاعدة البيانات) */
 const DEFAULT_CFG = {url: 'https://dpxivnzaaqiiiabssrqf.supabase.co', key: 'sb_publishable_Jh23JBER2VljR63DjqKzbg_VdshUnY3'};
 function cfg() { try { return JSON.parse(localStorage.getItem('mt_cfg') || 'null') || DEFAULT_CFG; } catch (e) { return DEFAULT_CFG; } }
+function tfetch(u, o) {
+  const ac = new AbortController(), t = setTimeout(() => ac.abort(), 20000);
+  if (o && o.signal) o.signal.addEventListener('abort', () => ac.abort());
+  return fetch(u, Object.assign({}, o, {signal: ac.signal})).finally(() => clearTimeout(t));
+}
+const TMO = 'الاتصال بالسيرفر بطيء أو واقف. اتأكد من النت واضغط إعادة المحاولة.';
+function withTmo(p, ms) { return Promise.race([p, new Promise((_, rj) => setTimeout(() => rj(new Error(TMO)), ms))]); }
 async function fetchAll(t) {
   let out = [], from = 0;
   for (;;) {
     const {data, error} = await sb.from(TBL[t]).select('*').order('created_at', {ascending: false}).range(from, from + 999);
-    if (error) throw error;
+    if (error) { error.message = 'تحميل ' + t + ': ' + error.message; throw error; }
     out = out.concat(data);
     if (data.length < 1000) return out;
     from += 1000;
@@ -65,6 +72,7 @@ async function mut(t, op, row, id) {
 function errMsg(x) {
   const m = (x && x.message) || '';
   if (/Invalid login/i.test(m)) return 'الإيميل أو كلمة السر غلط';
+  if (/abort/i.test(m)) return TMO;
   if (/fetch|network/i.test(m)) return 'مفيش إنترنت أو الاتصال فشل. جرّب تاني.';
   return m || 'حصل خطأ، جرّب تاني';
 }
@@ -302,8 +310,8 @@ async function boot() {
   if (DEMO) { await loadAll(); if (!location.hash) location.hash = '#/home'; render(); return; }
   const c = cfg();
   if (!c) { setupScreen(); return; }
-  if (!sb) sb = supabase.createClient(c.url, c.key, {auth: {persistSession: true, autoRefreshToken: true, detectSessionInUrl: false}});
-  const {data} = await sb.auth.getSession();
+  if (!sb) sb = supabase.createClient(c.url, c.key, {auth: {persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, lock: async (n, t, fn) => await fn()}, global: {fetch: tfetch}});
+  let data; try { ({data} = await withTmo(sb.auth.getSession(), 12000)); } catch (e) { $('#app').innerHTML = `<div class="empty">${esc(errMsg(e))}<br><br><button class="btn" onclick="boot()">إعادة المحاولة</button></div>`; return; }
   if (!data.session) { loginScreen(); return; }
   if (loadCache()) {
     READY = true;
@@ -314,7 +322,7 @@ async function boot() {
     return;
   }
   $('#app').innerHTML = '<div class="empty">جاري التحميل…</div>';
-  try { await loadAll(); } catch (e) {
+  try { await withTmo(loadAll(), 25000); } catch (e) {
     $('#app').innerHTML = `<div class="empty">${esc(errMsg(e))}<br><br><button class="btn" onclick="boot()">إعادة المحاولة</button></div>`; return;
   }
   READY = true;
