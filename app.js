@@ -1,5 +1,5 @@
-/* مطبعتي v1.0.9 */
-const APP_VERSION = '1.0.9';
+/* مطبعتي v1.0.13 */
+const APP_VERSION = '1.0.13';
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt = n => Number(n || 0).toLocaleString('en-US', {maximumFractionDigits: 2});
@@ -96,22 +96,25 @@ function head(title, sub, opts = {}) {
   return `<div class="top">${opts.back ? `<button class="ib" data-act="back">${svg('back')}</button>` : '<div class="lg">م</div>'}<div class="ti">${esc(title)}${sub ? `<span class="sub">${esc(sub)}</span>` : ''}</div>${opts.gear === false ? '' : `<button class="ib" data-act="settings">${svg('gear')}</button>`}</div>`;
 }
 function nav(v) {
-  const L = [['home', 'الرئيسية', '⌂'], ['items', 'الأصناف', '▤'], ['customers', 'العملاء', '☻'], ['accounts', 'الحسابات', '💰']];
-  return `<div class="nav">${L.map(l => `<a href="#/${l[0]}" class="${v === l[0] || (v === 'c' && l[0] === 'accounts') ? 'on' : ''}"><span>${l[2]}</span>${l[1]}</a>`).join('')}</div>`;
+  const L = [['home', 'الرئيسية', 'home'], ['items', 'الأصناف', 'items'], ['customers', 'العملاء', 'user'], ['accounts', 'الحسابات', 'wallet']];
+  return `<div class="nav">${L.map(l => `<a href="#/${l[0]}" class="${v === l[0] || (v === 'c' && l[0] === 'accounts') ? 'on' : ''}">${svg(l[2])}${l[1]}</a>`).join('')}</div>`;
 }
 function searchBox(ph) { return `<div class="sr"><input id="q" placeholder="${ph}" value="${esc(Q)}" autocomplete="off"></div>`; }
 
 function pageHome() {
   const t = totals();
-  const top = S.customers.map(c => ({c, b: balance(c.id)})).filter(x => x.b !== 0).sort((a, b) => Math.abs(b.b) - Math.abs(a.b)).slice(0, 2);
-  return `<div class="hm"><div class="top"><div class="lg" data-act="settings">م</div><div style="flex:1"><div class="t">مطبعتي</div><div class="h">أهلاً يا سارة</div></div><button class="ib" data-act="settings">${svg('gear')}</button></div>
-    <div class="big"><div style="font-size:14px">إجمالي الديون الخارجية</div><b>${fmt(t.debt)} ج</b><div style="font-size:13px">${t.cnt} عميل عليهم مبالغ</div></div>
+  const lb = +localStorage.getItem('mt_lastbackup') || 0;
+  const old = !lb || (Date.now() - lb) > 7 * 864e5;
+  const top = S.customers.map(c => ({c, b: balance(c.id)})).filter(x => x.b > 0).sort((a, b) => b.b - a.b).slice(0, 5);
+  return head('مطبعتي', 'أهلاً يا سارة') +
+    (old && S.customers.length ? '<div class="ban">آخر نسخة احتياطية قديمة. من ⚙️ اضغط "نسخة احتياطية Excel".</div>' : '') +
+    `<div class="big" data-go="accounts" style="cursor:pointer"><div style="font-size:14px">إجمالي الديون الخارجية</div><b>${fmt(t.debt)} ج</b><small>${t.cnt} عميل عليهم مبالغ${t.credit ? ` · ليهم عندنا ${fmt(t.credit)} ج` : ''}</small></div>
     <div class="g">
-    <button class="tile" style="border-top-color:var(--t)" data-go="items"><span class="ic">▤</span>الأصناف<small>الأسعار والتفاصيل</small></button>
-    <button class="tile" style="border-top-color:var(--p)" data-go="customers"><span class="ic">☻</span>العملاء<small>الأرقام والعناوين</small></button>
-    <button class="tile" style="border-top-color:var(--y)" data-go="places"><span class="ic">🛠️</span>أماكن الصيانة<small>اللي بنتعامل معاها</small></button>
-    <button class="tile" style="border-top-color:var(--k)" data-go="accounts"><span class="ic">💰</span>الحسابات<small>دائن ومدين</small></button></div>
-    ${top.map(x => `<button class="row" data-go="c/${x.c.id}"><span>${esc(x.c.name)}</span><b style="color:${x.b > 0 ? 'var(--p)' : 'var(--t)'}">${x.b > 0 ? 'مدين' : 'دائن'} ${fmt(Math.abs(x.b))}</b></button>`).join('')}</div>` + nav('home');
+    <button class="tile" style="border-top-color:var(--t)" data-go="items">${svg('items')}<span>الأصناف<br><small>${S.items.length} صنف</small></span></button>
+    <button class="tile" style="border-top-color:var(--p)" data-go="customers">${svg('user')}<span>العملاء<br><small>${S.customers.length} عميل</small></span></button>
+    <button class="tile" style="border-top-color:var(--y)" data-go="places">${svg('tool')}<span>أماكن الصيانة<br><small>${S.places.length} مكان</small></span></button>
+    <button class="tile" style="border-top-color:var(--k)" data-go="accounts">${svg('wallet')}<span>الحسابات<br><small>دائن ومدين</small></span></button></div>
+    ${top.length ? '<div class="h2">أكبر المديونيات</div>' + top.map(x => `<button class="row" data-go="c/${x.c.id}"><span class="n">${esc(x.c.name)}</span>${balHTML(x.b)}</button>`).join('') : ''}` + nav('home');
 }
 function listItems() {
   const q = Q.trim().toLowerCase();
@@ -159,6 +162,7 @@ function pageCustomer(id) {
 }
 
 function render() {
+  document.body.classList.remove('lgn');
   BM = null;
   const r = (location.hash || '#/').slice(2).split('/');
   const v = r[0] || 'home';
@@ -167,7 +171,11 @@ function render() {
   const keep = $('#q') && document.activeElement === $('#q');
   $('#app').innerHTML = pages[v]();
   if (keep && $('#q')) { const q = $('#q'); q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
+  setNavH();
 }
+function setNavH() { const n = document.querySelector('.nav'); if (n) document.documentElement.style.setProperty('--navh', n.offsetHeight + 'px'); }
+window.addEventListener('resize', setNavH);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(setNavH);
 function redrawList() {
   const v = (location.hash || '#/').slice(2).split('/')[0];
   const f = {items: listItems, customers: listCustomers, places: listPlaces, accounts: listAccounts}[v];
@@ -288,6 +296,7 @@ function setupScreen() {
   };
 }
 function loginScreen() {
+  document.body.classList.add('lgn');
   $('#app').innerHTML = `<div class="lw"><div class="lgo">م</div><div class="lt">مطبعتي</div><div class="lh">سجّل دخولك عشان تبدأ</div>
   <form id="lf"><input class="f1" name="email" type="email" placeholder="البريد الإلكتروني" autocomplete="username" autocapitalize="off">
   <input class="f2" name="pw" type="password" placeholder="كلمة السر" autocomplete="current-password"><button class="lb" type="submit">دخول</button><div class="err" id="ferr"></div></form>

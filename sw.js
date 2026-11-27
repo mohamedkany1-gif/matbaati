@@ -1,4 +1,4 @@
-const APP_VERSION = '1.0.9';
+const APP_VERSION = '1.0.13';
 const CACHE = 'matbaati-' + APP_VERSION;
 const SHELL = ['./', 'index.html', 'app.js', 'supabase.min.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
