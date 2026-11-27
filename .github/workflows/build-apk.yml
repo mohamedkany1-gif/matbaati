@@ -127,10 +127,10 @@ jobs:
           if 'windowSoftInputMode' in m:
               m = re.sub(r'android:windowSoftInputMode="[^"]*"', 'android:windowSoftInputMode="adjustResize"', m)
           else:
-              m = m.replace('<activity ', '<activity android:windowSoftInputMode="adjustResize" ', 1)
+              m = re.sub(r'<activity\b', '<activity android:windowSoftInputMode="adjustResize"', m, count=1)
           open(mp, 'w', encoding='utf-8').write(m)
           PYEOF2
-          grep -n 'adjustResize' android/app/src/main/AndroidManifest.xml
+          grep -n 'adjustResize' android/app/src/main/AndroidManifest.xml || (echo 'manifest patch failed'; exit 1)
           npx cap sync android
           rm -rf android/app/src/main/res/mipmap-anydpi-v26
           for d in android/app/src/main/res/mipmap-*; do
