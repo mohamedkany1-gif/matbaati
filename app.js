@@ -1,5 +1,5 @@
-/* مطبعتي v1.0.13 */
-const APP_VERSION = '1.0.13';
+/* مطبعتي v1.0.18 */
+const APP_VERSION = '1.0.18';
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt = n => Number(n || 0).toLocaleString('en-US', {maximumFractionDigits: 2});
@@ -101,13 +101,19 @@ function nav(v) {
 }
 function searchBox(ph) { return `<div class="sr"><input id="q" placeholder="${ph}" value="${esc(Q)}" autocomplete="off"></div>`; }
 
+let BANON = null;
+function showBan(old) {
+  if (BANON === null) { BANON = !!(old && S.customers.length && !localStorage.getItem('mt_ban_seen')); if (BANON) localStorage.setItem('mt_ban_seen', '1'); }
+  return BANON;
+}
+window.addEventListener('hashchange', () => { if (BANON) BANON = false; });
 function pageHome() {
   const t = totals();
   const lb = +localStorage.getItem('mt_lastbackup') || 0;
   const old = !lb || (Date.now() - lb) > 7 * 864e5;
   const top = S.customers.map(c => ({c, b: balance(c.id)})).filter(x => x.b > 0).sort((a, b) => b.b - a.b).slice(0, 5);
   return head('مطبعتي', 'أهلاً يا سارة') +
-    (old && S.customers.length ? '<div class="ban">آخر نسخة احتياطية قديمة. من ⚙️ اضغط "نسخة احتياطية Excel".</div>' : '') +
+    (showBan(old) ? '<div class="ban">آخر نسخة احتياطية قديمة. من ⚙️ اضغط "نسخة احتياطية Excel".</div>' : '') +
     `<div class="big" data-go="accounts" style="cursor:pointer"><div style="font-size:14px">إجمالي الديون الخارجية</div><b>${fmt(t.debt)} ج</b><small>${t.cnt} عميل عليهم مبالغ${t.credit ? ` · ليهم عندنا ${fmt(t.credit)} ج` : ''}</small></div>
     <div class="g">
     <button class="tile" style="border-top-color:var(--t)" data-go="items">${svg('items')}<span>الأصناف<br><small>${S.items.length} صنف</small></span></button>
@@ -255,9 +261,18 @@ function backup() {
   if (NATIVE) {
     (async () => {
       try {
-        const FS = Capacitor.registerPlugin('Filesystem'), SH = Capacitor.registerPlugin('Share');
-        const r = await FS.writeFile({path: fname, data: xml, directory: 'CACHE', encoding: 'utf8'});
-        await SH.share({title: 'نسخة مطبعتي الاحتياطية', url: r.uri, dialogTitle: 'احفظ أو ابعت النسخة'});
+        const C = window.Capacitor || {};
+        const call = async (p, m, o) => {
+          const tries = [];
+          if (C.nativePromise) tries.push(() => C.nativePromise(p, m, o));
+          if (C.Plugins && C.Plugins[p] && C.Plugins[p][m]) tries.push(() => C.Plugins[p][m](o));
+          if (C.registerPlugin) tries.push(() => C.registerPlugin(p)[m](o));
+          let last = new Error('إضافة الملفات مش موجودة');
+          for (const t of tries) { try { return await t(); } catch (e) { if (/cancel/i.test(String(e && e.message || e))) throw e; last = e; } }
+          throw last;
+        };
+        const r = await call('Filesystem', 'writeFile', {path: fname, data: xml, directory: 'CACHE', encoding: 'utf8'});
+        await call('Share', 'share', {title: 'نسخة مطبعتي الاحتياطية', url: r.uri, dialogTitle: 'احفظ أو ابعت النسخة'});
         localStorage.setItem('mt_lastbackup', String(Date.now()));
       } catch (e) { if (!/cancel/i.test(String(e && e.message || e))) tell('تعذر عمل النسخة: ' + errMsg(e)); }
     })();
@@ -347,7 +362,7 @@ document.addEventListener('click', async e => {
   else if (a === 'back') { if (history.length > 1) history.back(); else location.hash = '#/customers'; }
   else if (a === 'settings') settings();
   else if (a === 'backup') backup();
-  else if (a === 'refresh') { await loadAll(); render(); closeModal(); }
+  else if (a === 'refresh') { const before = JSON.stringify(S); try { await withTmo(loadAll(), 25000); } catch (x) { closeModal(); tell('تعذر التحديث: ' + errMsg(x)); return; } render(); closeModal(); tell(JSON.stringify(S) === before ? 'لا يوجد تحديث، البيانات محدثة' : 'تم تحديث البيانات'); }
   else if (a === 'logout') { { await sb.auth.signOut(); try { localStorage.removeItem(CK); } catch (e) {} closeModal(); boot(); } }
   else if (a === 'add-item') itemForm();
   else if (a === 'edit-item') itemForm(S.items.find(x => x.id === id));
@@ -362,7 +377,7 @@ document.addEventListener('click', async e => {
 document.addEventListener('input', e => { if (e.target.id === 'q') { Q = e.target.value; redrawList(); } });
 window.addEventListener('hashchange', () => { Q = ''; if (READY || DEMO) render(); window.scrollTo(0, 0); });
 
-if ('serviceWorker' in navigator && !DEMO && !NATIVE && location.protocol.startsWith('http')) {
+if ('serviceWorker' in navigator && !DEMO && location.protocol.startsWith('http')) {
   const had = !!navigator.serviceWorker.controller;
   navigator.serviceWorker.register('sw.js').catch(() => {});
   navigator.serviceWorker.addEventListener('controllerchange', () => { if (had) location.reload(); });
