@@ -24,11 +24,13 @@ jobs:
       - name: Create Android project
         run: |
           mkdir -p build/www
-          cp index.html app.js supabase.min.js manifest.webmanifest icon-192.png icon-512.png version.json build/www/
+          cp index.html app.js sw.js supabase.min.js manifest.webmanifest icon-192.png icon-512.png version.json build/www/
           cd build
           npm init -y
           npm i --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/filesystem@6 @capacitor/share@6
           npx cap init "Matbaati" com.matbaati.app --web-dir=www
+          node -e "const fs=require('fs');const c=JSON.parse(fs.readFileSync('capacitor.config.json'));c.server={url:'https://mohamedkany1-gif.github.io/matbaati/',cleartext:false,allowNavigation:['mohamedkany1-gif.github.io','*.supabase.co']};fs.writeFileSync('capacitor.config.json',JSON.stringify(c,null,2))"
+          cat capacitor.config.json
           npx cap add android
           npx cap sync android
           rm -rf android/app/src/main/res/mipmap-anydpi-v26
