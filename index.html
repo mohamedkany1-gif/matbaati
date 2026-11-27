@@ -25,6 +25,35 @@ svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-l
 .tile{background:#fff;border-radius:22px;padding:16px 14px;font-weight:700;font-size:17px;min-height:112px;display:flex;flex-direction:column;justify-content:space-between;border:0;border-top:6px solid var(--t);text-align:right;color:var(--ink);font-family:inherit;width:100%}
 .tile small{font-weight:400;font-size:12px;opacity:.7}.tile svg{width:30px;height:30px}
 .tile.lg2,.tile.lg3{font-size:14px;line-height:1.35}.tile.nm span{line-height:1.3;text-wrap:balance}
+
+.lc{display:flex;flex-direction:column;align-items:center;width:100%;background:#fff;border-radius:30px;padding:26px 20px 24px;box-shadow:0 18px 50px #0b3b4040;animation:lwin .7s cubic-bezier(.2,.9,.3,1.2) both}
+.lw input{background:var(--bg)}
+.lw .lh{margin-bottom:30px}.lw .dots{margin-top:34px}
+.lw .dots b{animation:lgdot 1.6s ease-in-out infinite}.lw .dots b:nth-child(2){animation-delay:.15s}.lw .dots b:nth-child(3){animation-delay:.3s}.lw .dots b:nth-child(4){animation-delay:.45s}
+@keyframes lgdot{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes lwin{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:none}}
+.lc{position:relative;overflow:hidden;min-height:calc(var(--vh,100vh)*.8);justify-content:center;padding:40px 22px 30px}
+.lc::before{content:"";position:absolute;top:0;left:26px;right:26px;height:6px;border-radius:0 0 6px 6px;background:linear-gradient(90deg,var(--t) 0 25%,var(--p) 25% 50%,var(--y) 50% 75%,var(--k) 75% 100%)}
+.lc::after{content:"";position:absolute;left:-60px;bottom:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,#16a5a022,#16a5a000 70%);pointer-events:none}
+.lc .lgo{position:relative;width:118px;height:118px;border-radius:34px;box-shadow:0 12px 28px #0e7c8640;animation:lgpop 1.2s cubic-bezier(.2,.9,.3,1.15) backwards,lgfloat 3.6s ease-in-out 1.3s infinite}
+.lc .lgo::after{content:"";position:absolute;inset:0;border-radius:34px;border:3px solid var(--t);opacity:0;animation:lgring 2.6s ease-out 1s infinite}
+.lc .lt{margin-top:18px;animation:lgup .6s ease-out .75s backwards}
+.lc .lh{animation:lgup .6s ease-out .9s backwards}
+.lc form{animation:lgup .6s ease-out 1.05s backwards}
+.lc .forgot{animation:lgup .6s ease-out 1.2s backwards}
+.lc .dots{animation:lgup .6s ease-out 1.3s backwards}
+.lw .dots b{animation:lgdot 1.6s ease-in-out 1.9s infinite}
+@keyframes lgpop{0%{transform:scale(0) rotate(-220deg);opacity:0}55%{transform:scale(1.18) rotate(10deg);opacity:1}75%{transform:scale(.94) rotate(-4deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes lgfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes lgring{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.7);opacity:0}}
+@keyframes lgup{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+body.lgn.go .lc{animation:lgpulse .9s ease-in-out infinite}
+body.lgn.go .lw .lgo{animation:lgjump .6s ease-in-out infinite}
+body.lgn.go .lw .dots b{animation-delay:0s}
+body.lgn.go .lw .dots b{animation-duration:.5s}
+@keyframes lgpulse{0%,100%{transform:scale(1);box-shadow:0 18px 50px #0b3b4040}50%{transform:scale(1.025);box-shadow:0 0 0 6px #fff8,0 22px 70px #e5368a66}}
+@keyframes lgjump{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-12px) rotate(-6deg)}60%{transform:translateY(0) rotate(6deg)}}
+@media (prefers-reduced-motion:reduce){.lc,.lc *,.lc::after,.lw .dots b{animation:none!important}}
 .h2{font-size:15px;font-weight:800;margin:16px 4px 6px}
 .row{display:flex;justify-content:space-between;align-items:center;background:#fff;border-radius:18px;padding:13px 14px;margin-top:9px;font-size:15px;gap:10px;width:100%;border:0;text-align:right;color:var(--ink);font-family:inherit}
 .row .n{font-weight:700}.row .d{font-size:12px;opacity:.65;font-weight:400;display:block;margin-top:2px}
@@ -79,8 +108,8 @@ window.onerror=function(m,u,l){m=String(m);var f=String(u).split('/').pop();if(/
 <script src="supabase.min.js"></script>
 <script>if(!window.supabase)document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>')</script>
 <script>
-/* مطبعتي v1.0.32 */
-const APP_VERSION = '1.0.32';
+/* مطبعتي v1.0.38 */
+const APP_VERSION = '1.0.38';
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt = n => Number(n || 0).toLocaleString('en-US', {maximumFractionDigits: 2});
@@ -108,6 +137,12 @@ let NODATA = false, BOOTOK = false, MUT = 0, BM = null, READY = false, sb = null
 /* بيانات الاتصال (مفتاح publishable عام بطبيعته، والأمان من قواعد RLS في قاعدة البيانات) */
 const DEFAULT_CFG = {url: 'https://dpxivnzaaqiiiabssrqf.supabase.co', key: 'sb_publishable_Jh23JBER2VljR63DjqKzbg_VdshUnY3'};
 function cfg() { try { return JSON.parse(localStorage.getItem('mt_cfg') || 'null') || DEFAULT_CFG; } catch (e) { return DEFAULT_CFG; } }
+const USERS = {'sara ahmed': 'sara.matbaati@example.com'};
+function resolveUser(v) {
+  const t = String(v || '').trim();
+  if (t.includes('@')) return t;
+  return USERS[t.toLowerCase().replace(/\s+/g, ' ')] || null;
+}
 function tfetch(u, o) {
   const ac = new AbortController(), t = setTimeout(() => ac.abort(), 20000);
   if (o && o.signal) o.signal.addEventListener('abort', () => ac.abort());
@@ -264,7 +299,7 @@ function pageCustomer(id) {
 
 function render() {
   BOOTOK = true;
-  document.body.classList.remove('lgn');
+  document.body.classList.remove('lgn', 'go');
   BM = null;
   const r = (location.hash || '#/').slice(2).split('/');
   const v = r[0] || 'home';
@@ -426,17 +461,19 @@ function setupScreen() {
 function loginScreen() {
   BOOTOK = true;
   document.body.classList.add('lgn');
-  $('#app').innerHTML = `<div class="lw"><div class="lgo">م</div><div class="lt">مطبعتي</div><div class="lh">سجّل دخولك عشان تبدأ</div>
-  <form id="lf"><input class="f1" name="email" type="email" placeholder="البريد الإلكتروني" autocomplete="username" autocapitalize="off">
+  $('#app').innerHTML = `<div class="lw"><div class="lc"><div class="lgo">م</div><div class="lt">مطبعتي</div><div class="lh">سجّل دخولك عشان تبدأ</div>
+  <form id="lf"><input class="f1" name="email" type="text" placeholder="اسم المستخدم" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false">
   <input class="f2" name="pw" type="password" placeholder="كلمة السر" autocomplete="current-password"><button class="lb" type="submit">دخول</button><div class="err" id="ferr"></div></form>
   <div class="forgot">نسيت كلمة السر؟</div>
-  <div class="dots"><b style="background:var(--t)"></b><b style="background:var(--p)"></b><b style="background:var(--y)"></b><b style="background:var(--k)"></b></div></div>`;
+  <div class="dots"><b style="background:var(--t)"></b><b style="background:var(--p)"></b><b style="background:var(--y)"></b><b style="background:var(--k)"></b></div></div></div>`;
   $('#lf').onsubmit = async e => {
     e.preventDefault();
     const o = Object.fromEntries(new FormData(e.target));
-    const b = e.target.querySelector('.lb'); b.disabled = true;
-    const {error} = await sb.auth.signInWithPassword({email: o.email.trim(), password: o.pw});
-    if (error) { $('#ferr').textContent = errMsg(error); $('#ferr').style.marginTop = '10px'; b.disabled = false; return; }
+    const b = e.target.querySelector('.lb'); b.disabled = true; document.body.classList.add('go');
+    const em = resolveUser(o.email);
+    if (!em) { document.body.classList.remove('go'); $('#ferr').textContent = 'اسم المستخدم أو كلمة السر غلط'; $('#ferr').style.marginTop = '10px'; b.disabled = false; return; }
+    const {error} = await sb.auth.signInWithPassword({email: em, password: o.pw});
+    if (error) { document.body.classList.remove('go'); $('#ferr').textContent = errMsg(error); $('#ferr').style.marginTop = '10px'; b.disabled = false; return; }
     boot();
   };
 }
