@@ -65,8 +65,8 @@ body.typing .lc .lgo,body.typing .lc .lgo::after,body.typing .lw .dots b{animati
 .row .n{font-weight:700}.row .d{font-size:12px;opacity:.65;font-weight:400;display:block;margin-top:2px}
 .m{color:var(--p);font-weight:800;white-space:nowrap}.c{color:var(--t);font-weight:800;white-space:nowrap}.z{opacity:.5;white-space:nowrap}
 .sr{display:flex;gap:8px;margin-bottom:6px}
-input,textarea{width:100%;border:2px solid transparent;background:#fff;border-radius:16px;padding:14px;font-size:16px;font-family:inherit;color:var(--ink);outline:0}
-input:focus,textarea:focus{border-color:var(--t)}
+input,textarea,select{width:100%;border:2px solid transparent;background:#fff;border-radius:16px;padding:14px;font-size:16px;font-family:inherit;color:var(--ink);outline:0}
+input:focus,textarea:focus,select:focus{border-color:var(--t)}
 .fab{position:fixed;bottom:calc(84px + var(--sab));left:18px;width:58px;height:58px;border-radius:20px;border:0;background:var(--p);color:#fff;box-shadow:0 6px 18px #0003;display:flex;align-items:center;justify-content:center;z-index:5}
 .fab svg{width:30px;height:30px;stroke-width:2.6}
 .nav{position:fixed;bottom:0;left:0;right:0;background:#fff;display:flex;justify-content:space-around;padding:8px 0 calc(10px + var(--sab));z-index:6;box-shadow:0 -2px 12px #0001}
@@ -80,7 +80,7 @@ input:focus,textarea:focus{border-color:var(--t)}
 .sheet{background:var(--bg);width:100%;max-width:480px;border-radius:26px 26px 0 0;padding:18px 16px calc(20px + var(--sab));max-height:92vh;overflow:auto}
 .sh-h{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:19px;margin-bottom:10px}
 .sh-h button{border:0;background:#fff;border-radius:12px;width:36px;height:36px;font-size:16px;color:var(--ink)}
-label{display:block;font-size:14px;font-weight:700;margin:10px 2px}label>input,label>textarea{margin-top:6px;font-weight:400}
+label{display:block;font-size:14px;font-weight:700;margin:10px 2px}label>input,label>textarea,label>select{margin-top:6px;font-weight:400}
 .err{color:#c0262d;font-size:14px;margin-top:8px;min-height:4px}
 .empty{text-align:center;opacity:.6;padding:40px 10px;font-size:15px}
 .center{display:flex;flex-direction:column;align-items:center;padding-top:60px}
@@ -101,7 +101,14 @@ label{display:block;font-size:14px;font-weight:700;margin:10px 2px}label>input,l
 .lw form{width:100%}.lw input{border:0;border-radius:18px;padding:16px;font-size:15px;background:#fdfefe;margin-bottom:12px;text-align:right}
 .lw input{font-size:22px}.lw input::placeholder{color:var(--ink);opacity:1;font-size:15px}.lw .f1{border-right:6px solid var(--t)}.lw .f2{border-right:6px solid var(--p);margin-bottom:22px}
 .lw .lb{width:100%;background:var(--t);color:#fff;border:0;border-radius:18px;padding:16px;text-align:center;font-weight:800;font-size:18px;font-family:inherit}
-.lw .err{margin:0;min-height:0}.lw .forgot{font-size:13px;opacity:.65;margin-top:18px}.lw .dots{display:flex;gap:8px;margin-top:60px}.lw .dots b{width:14px;height:14px;border-radius:50%}
+.lw .err{margin:0;min-height:0;text-align:center}.lw .forgot{cursor:pointer;padding:6px 10px}
+#fgbox{position:fixed;top:0;left:0;right:0;bottom:0;background:#0b3b4066;z-index:30;display:flex;align-items:center;justify-content:center;padding:20px}
+.fgc{position:relative;width:100%;max-width:340px;background:#fff;border-radius:26px;padding:26px 20px 22px;box-shadow:0 18px 50px #0b3b4040;text-align:center}
+.fgx{position:absolute;top:10px;left:12px;border:0;background:none;font-size:18px;color:var(--ink);opacity:.5}
+.fgt{font-size:20px;font-weight:800;margin-bottom:6px}.fgs{font-size:13px;opacity:.65;margin-bottom:16px}
+.fgc input{border:0;border-radius:16px;padding:14px;font-size:18px;background:var(--bg);margin-bottom:12px;text-align:left}
+.fgc .lb{width:100%;background:var(--t);color:#fff;border:0;border-radius:16px;padding:14px;font-weight:800;font-size:17px;font-family:inherit}.fgc .lb:disabled{opacity:.6}
+.fgc .err{margin:0;min-height:0;text-align:center}.fgcode{text-align:center!important;letter-spacing:6px;font-size:24px!important}.fgl{margin-top:14px;font-size:13px;color:var(--t);cursor:pointer;padding:6px}.lw .forgot{font-size:13px;opacity:.65;margin-top:18px}.lw .dots{display:flex;gap:8px;margin-top:60px}.lw .dots b{width:14px;height:14px;border-radius:50%}
 .lg,.lgo{background:#0e7c86 url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzBlN2M4NiIvPjxwYXRoIGZpbGw9IiNmZmYiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE0Ni4xNSAzMDIuOSkgc2NhbGUoLjI5IC0uMjkpIiBkPSJNNjUgLTRRNjYgNDAgODcuMCA3My4wUTEwOCAxMDYgMTQyLjAgMTI1LjVRMTc2IDE0NSAyMTYgMTQ2UTIwMiAxNjkgMTkwLjAgMjAxLjVRMTc4IDIzNCAxNzggMjc0UTE3OCAzMTUgMTg5LjUgMzY0LjBRMjAxIDQxMyAyMzIgNDU2UTI4NCA0ODUgMzM2LjAgNTAxLjBRMzg4IDUxNyA0NDEgNTE3UTUxOSA1MTcgNTgwIDQ4N1E2NDIgNDU3IDY3Ni41IDM5OS41UTcxMSAzNDIgNzExIDI3MVE3MTEgMjMxIDcwMC41IDE5My41UTY5MCAxNTYgNjY0IDExOFE2MzAgNjYgNTYxLjUgMzMuNVE0OTMgMSA0MTMgMEgzNDVRMjkzIDAgMjczLjUgLTE4LjBRMjU0IC0zNiAyNTQgLTgwVi0zMjBINjVaTTM2NSAyNThRMzY1IDIyOCAzNzEuNSAxOTkuNVEzNzggMTcxIDM4OCAxNDhINDE4UTQ1NyAxNDggNDg5LjAgMTc1LjVRNTIxIDIwMyA1MjEgMjYxUTUyMSAzMDggNDk2LjUgMzM0LjBRNDcyIDM2MCA0MzggMzYwUTQyMyAzNjAgNDA3LjUgMzU1LjVRMzkyIDM1MSAzNzggMzQwUTM3MSAzMjAgMzY4LjAgMjk3LjVRMzY1IDI3NSAzNjUgMjU4WiIvPjxjaXJjbGUgY3g9IjE5MS41IiBjeT0iMzk5IiByPSIyMSIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjI1NS41IiBjeT0iMzk5IiByPSIyMSIgZmlsbD0iI2YyYzIwMCIvPjxjaXJjbGUgY3g9IjMyMCIgY3k9IjM5OSIgcj0iMjEiIGZpbGw9IiNlNTM2OGEiLz48L3N2Zz4=) center/100% 100% no-repeat !important;font-size:0 !important;color:transparent !important}#dlg{display:none;position:fixed;inset:0;background:#0009;z-index:50;align-items:center;justify-content:center;padding:24px}#dlg.on{display:flex}.dbox{background:#fff;border-radius:24px;padding:24px 20px 18px;width:100%;max-width:340px;text-align:center;color:var(--ink);box-shadow:0 10px 40px #0004}.dm{font-weight:800;font-size:18px;margin-bottom:22px;line-height:1.6}.dbt{display:flex;gap:10px;flex-direction:row-reverse}.dbt button{flex:1;border:0;border-radius:16px;padding:14px;font-size:16px;font-weight:800;font-family:inherit;background:var(--t);color:#fff}.dbt .dc{background:#eaf5f5;color:var(--t)}.dbt .dd{background:var(--p)}html,body{overflow-x:hidden;max-width:100%;touch-action:pan-y;-webkit-text-size-adjust:100%}.fab{bottom:calc(var(--navh,88px) + 16px)}#app{padding-bottom:calc(var(--navh,88px) + 24px)}body.lgn #app{padding:0;min-height:var(--vh,100vh)}body.lgn .lw{justify-content:center;margin:0;padding:0 22px;min-height:var(--vh,100vh)}</style>
 </head>
 <body>
@@ -114,8 +121,8 @@ window.onerror=function(m,u,l){m=String(m);var f=String(u).split('/').pop();if(/
 <script src="supabase.min.js"></script>
 <script>if(!window.supabase)document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>')</script>
 <script>
-/* مطبعتي v1.0.40 */
-const APP_VERSION = '1.0.40';
+/* مطبعتي v1.0.45 */
+const APP_VERSION = '1.0.45';
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt = n => Number(n || 0).toLocaleString('en-US', {maximumFractionDigits: 2});
@@ -202,6 +209,79 @@ async function mut(t, op, row, id) {
   else if (op === 'upd') { const {data, error} = await q.update(row).eq('id', id).select().single(); if (error) throw error; const i = S[t].findIndex(x => x.id === id); if (i >= 0) S[t][i] = data; }
   else { const {error} = await q.delete().eq('id', id); if (error) throw error; S[t] = S[t].filter(x => x.id !== id); if (t === 'customers') S.ledger = S.ledger.filter(x => x.customer_id !== id); }
   BM = null; saveCache(); render();
+}
+function forgotBox() {
+  if ($('#fgbox')) return;
+  const d = document.createElement('div'); d.id = 'fgbox';
+  let em = '', authed = false;
+  const card = h => { d.innerHTML = `<div class="fgc"><button type="button" class="fgx" id="fgx">✕</button>${h}</div>`; $('#fgx').onclick = close; };
+  const close = async () => { if (authed) { authed = false; try { await sb.auth.signOut(); } catch (x) {} } d.remove(); };
+  d.onclick = e => { if (e.target === d) close(); };
+  const fail = (x, er) => { er.style.color = ''; er.textContent = /rate limit|seconds|too many/i.test(String((x && x.message) || '')) ? 'استنى شوية وجرّب تاني' : (/abort|fetch|network|timeout/i.test(String((x && x.message) || x)) ? 'لا يوجد اتصال بالإنترنت' : 'حصل خطأ، جرّب تاني'); };
+  const send = async (er, b) => {
+    const {error} = await withTmo(sb.auth.resetPasswordForEmail(em), 15000);
+    if (error) throw error;
+  };
+  const s1 = () => {
+    card(`<div class="fgt">استرجاع كلمة السر</div><div class="fgs">اكتب إيميلك ونبعتلك كود من 6 أرقام</div><form id="fgf"><input name="v" type="email" dir="ltr" placeholder="name@example.com" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false"><button class="lb" type="submit">إرسال الكود</button><div class="err" id="fge"></div></form>`);
+    $('#fgf').onsubmit = async e => {
+      e.preventDefault();
+      const v = String(new FormData(e.target).get('v') || '').trim(), er = $('#fge'), b = e.target.querySelector('.lb');
+      er.style.color = ''; er.style.marginTop = '10px';
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { er.textContent = 'اكتب الإيميل بشكل صحيح'; return; }
+      em = v; b.disabled = true;
+      try { await send(); s2('تم إرسال الكود على إيميلك'); } catch (x) { fail(x, er); b.disabled = false; }
+    };
+  };
+  const s2 = note => {
+    card(`<div class="fgt">اكتب الكود</div><div class="fgs">الكود اتبعت على إيميلك (شوف Spam كمان)</div><form id="fgf"><input name="v" type="text" inputmode="numeric" dir="ltr" maxlength="8" placeholder="123456" autocomplete="one-time-code" class="fgcode"><button class="lb" type="submit">تأكيد</button><div class="err" id="fge"></div></form><div class="fgl" id="fgre">إعادة إرسال الكود</div>`);
+    const er = $('#fge'); if (note) { er.style.color = '#0e7c86'; er.style.marginTop = '10px'; er.textContent = note; }
+    $('#fgre').onclick = async () => { er.style.color = ''; try { await send(); er.style.color = '#0e7c86'; er.textContent = 'تم إرسال كود جديد'; } catch (x) { fail(x, er); } };
+    $('#fgf').onsubmit = async e => {
+      e.preventDefault();
+      const v = normNum(new FormData(e.target).get('v')).replace(/\s+/g, ''), b = e.target.querySelector('.lb');
+      er.style.color = ''; er.style.marginTop = '10px';
+      if (!/^\d{6,8}$/.test(v)) { er.textContent = 'اكتب الكود اللي وصلك'; return; }
+      b.disabled = true;
+      try {
+        const r = await withTmo(sb.auth.verifyOtp({email: em, token: v, type: 'recovery'}), 15000);
+        if (r.error) { er.textContent = /expired|invalid/i.test(String(r.error.message)) ? 'الكود غلط أو منتهي' : 'حصل خطأ، جرّب تاني'; b.disabled = false; return; }
+        authed = true; s3();
+      } catch (x) { fail(x, er); b.disabled = false; }
+    };
+  };
+  const s3 = () => {
+    card(`<div class="fgt">كلمة سر جديدة</div><div class="fgs">اكتب كلمة السر الجديدة</div><form id="fgf"><input name="p1" type="password" placeholder="كلمة السر الجديدة" autocomplete="new-password"><input name="p2" type="password" placeholder="أكتبها تاني" autocomplete="new-password"><button class="lb" type="submit">حفظ</button><div class="err" id="fge"></div></form>`);
+    $('#fgf').onsubmit = async e => {
+      e.preventDefault();
+      const o = Object.fromEntries(new FormData(e.target)), er = $('#fge'), b = e.target.querySelector('.lb');
+      er.style.color = ''; er.style.marginTop = '10px';
+      if (String(o.p1 || '').length < 6) { er.textContent = 'كلمة السر لازم تكون 6 حروف أو أكتر'; return; }
+      if (o.p1 !== o.p2) { er.textContent = 'كلمتين السر مش متطابقين'; return; }
+      b.disabled = true;
+      try {
+        const u = await withTmo(sb.auth.updateUser({password: o.p1}), 15000);
+        if (u.error) { er.textContent = /same|different/i.test(String(u.error.message)) ? 'اختار كلمة سر مختلفة عن القديمة' : 'حصل خطأ، جرّب تاني'; b.disabled = false; return; }
+        try { await sb.auth.signOut(); } catch (x) {}
+        authed = false; d.remove();
+        const fe = $('#ferr'); if (fe) { fe.style.color = '#0e7c86'; fe.style.marginTop = '10px'; fe.textContent = 'تم تغيير كلمة السر، سجّل دخولك'; }
+      } catch (x) { fail(x, er); b.disabled = false; }
+    };
+  };
+  document.body.appendChild(d);
+  s1();
+}
+async function resolveLogin(v) {
+  const t = String(v || '').trim();
+  if (t.includes('@')) return t;
+  try { const r = await withTmo(sb.rpc('mt_login_email', {n: t}), 8000); if (r && !r.error && r.data) return r.data; } catch (e) {}
+  return resolveUser(v);
+}
+function loginMsg(x) {
+  const m = String((x && x.message) || '');
+  if (/Invalid login|credentials|Invalid/i.test(m) && !/fetch|network|abort/i.test(m)) return 'الاسم أو الرقم السري خطأ';
+  if (/abort|fetch|network|timeout|offline/i.test(m) || (x && /Retryable/i.test(String(x.name || '')))) return 'لا يوجد اتصال بالإنترنت';
+  return errMsg(x);
 }
 function errMsg(x) {
   const m = (x && x.message) || '';
@@ -310,7 +390,7 @@ function render() {
   BM = null;
   const r = (location.hash || '#/').slice(2).split('/');
   const v = r[0] || 'home';
-  const pages = {home: pageHome, items: pageItems, customers: pageCustomers, places: pagePlaces, accounts: pageAccounts, c: () => pageCustomer(r[1]), w: () => pageWallet(r[1])};
+  const pages = {home: pageHome, items: pageItems, customers: pageCustomers, places: pagePlaces, accounts: pageAccounts, c: () => pageCustomer(r[1]), w: () => pageWallet(r[1], r[2])};
   if (!(v in pages)) { location.hash = '#/home'; return; }
   const keep = $('#q') && document.activeElement === $('#q');
   $('#app').innerHTML = (NODATA && v !== 'home') ? '<div class="empty"></div>' + nav(v) : pages[v]();
@@ -348,7 +428,7 @@ const tell = m => dlg(m, 'تمام', null, false);
 function closeModal() { $('#modal').classList.remove('on'); $('#modal').innerHTML = ''; }
 function form(title, fields, vals, onSave, onDel, btn) {
   const m = $('#modal');
-  m.innerHTML = `<div class="sheet"><div class="sh-h">${esc(title)}<button type="button" data-act="close">✕</button></div><form id="f" autocomplete="off">${fields.map(f => `<label>${esc(f.l)}${f.t === 'area' ? `<textarea name="${f.k}" rows="3">${esc(vals[f.k] == null ? '' : vals[f.k])}</textarea>` : `<input name="${f.k}" type="${f.t || 'text'}" ${f.m ? `inputmode="${f.m}"` : ''} value="${esc(vals[f.k] == null ? '' : vals[f.k])}">`}</label>`).join('')}<div class="err" id="ferr"></div><button class="btn ${btn || ''}" type="submit">حفظ</button>${onDel ? '<button type="button" class="btn del" id="fdel">حذف</button>' : ''}</form></div>`;
+  m.innerHTML = `<div class="sheet"><div class="sh-h">${esc(title)}<button type="button" data-act="close">✕</button></div><form id="f" autocomplete="off">${fields.map(f => `<label>${esc(f.l)}${f.t === 'sel' ? `<select name="${f.k}">${f.o.map(x => `<option value="${x[0]}"${vals[f.k] === x[0] ? ' selected' : ''}>${esc(x[1])}</option>`).join('')}</select>` : f.t === 'area' ? `<textarea name="${f.k}" rows="3">${esc(vals[f.k] == null ? '' : vals[f.k])}</textarea>` : `<input name="${f.k}" type="${f.t || 'text'}" ${f.m ? `inputmode="${f.m}"` : ''} value="${esc(vals[f.k] == null ? '' : vals[f.k])}">`}</label>`).join('')}<div class="err" id="ferr"></div><button class="btn ${btn || ''}" type="submit">حفظ</button>${onDel ? '<button type="button" class="btn del" id="fdel">حذف</button>' : ''}</form></div>`;
   m.classList.add('on');
   $('#f').onsubmit = async e => {
     e.preventDefault();
@@ -366,19 +446,37 @@ function itemForm(it) {
 }
 const WK = {vodafone: 'كشف حساب فودافون كاش', instapay: 'كشف حساب انستا باي'};
 function walletKind() { const k = (location.hash || '').split('/')[2]; return WK[k] ? k : null; }
-function pageWallet(k) {
+const nk = n => String(n || '').trim().toLowerCase().replace(/\s+/g, ' ');
+const wsign = e => e.op === 'withdraw' ? -1 : 1;
+const wrem = es => es.reduce((a, e) => a + wsign(e) * Number(e.amount || 0), 0);
+const remHTML = v => `<b style="color:${v < 0 ? '#c0262d' : '#16845b'}">${v < 0 ? '-' : ''}${fmt(Math.abs(v))} ج</b>`;
+function pageWallet(k, key) {
   if (!WK[k]) { location.hash = '#/home'; return ''; }
-  const es = (S.wallet || []).filter(e => e.kind === k).sort((x, y) => String(y.created_at).localeCompare(String(x.created_at)));
-  const tot = es.reduce((a, e) => a + Number(e.amount || 0), 0);
-  return head(WK[k], `${es.length} عملية`, {back: true, gear: false}) +
-    `<div class="bal" style="background:linear-gradient(135deg,#0e7c86,#16a5a0)"><small>إجمالي المستلم</small><b>${fmt(tot)} ج</b></div>` +
-    (es.length ? es.map(e => `<button class="row" data-act="edit-w" data-id="${e.id}"><span class="n">${esc(e.name)}<span class="d">${esc(String(e.created_at || '').slice(0, 10))}</span></span><span class="c">${fmt(e.amount)}</span></button>`).join('') : '<div class="empty">مفيش حاجة لسه. اضغط + عشان تضيف.</div>') +
+  const all = (S.wallet || []).filter(e => e.kind === k);
+  if (key) {
+    const nm = decodeURIComponent(key);
+    const es = all.filter(e => nk(e.name) === nm).sort((x, y) => String(y.created_at).localeCompare(String(x.created_at)));
+    const dep = es.filter(e => e.op !== 'withdraw').reduce((a, e) => a + Number(e.amount || 0), 0), wd = es.filter(e => e.op === 'withdraw').reduce((a, e) => a + Number(e.amount || 0), 0), rem = dep - wd;
+    return head(es.length ? es[0].name : nm, WK[k], {back: true, gear: false}) +
+      `<div class="bal" style="background:linear-gradient(135deg,#0e7c86,#16a5a0)"><small>المتبقي</small><b>${rem < 0 ? '-' : ''}${fmt(Math.abs(rem))} ج</b><div style="display:flex;justify-content:space-between;margin-top:10px;font-size:13px"><span>إيداع: ${fmt(dep)}</span><span>سحب: ${fmt(wd)}</span></div></div>` +
+      (es.length ? es.map(e => `<button class="row" data-act="edit-w" data-id="${e.id}"><span class="n">${e.op === 'withdraw' ? 'سحب' : 'إيداع'}<span class="d">${esc(String(e.created_at || '').slice(0, 10))}</span></span><span class="c" style="color:${e.op === 'withdraw' ? '#c0262d' : '#16845b'}">${e.op === 'withdraw' ? '-' : '+'}${fmt(e.amount)}</span></button>`).join('') : '<div class="empty">مفيش عمليات.</div>') +
+      `<button class="fab" data-act="add-w" data-name="${esc(es.length ? es[0].name : nm)}">${svg('plus')}</button>` + nav('home');
+  }
+  const g = {}; all.forEach(e => { (g[nk(e.name)] = g[nk(e.name)] || []).push(e); });
+  const ps = Object.keys(g).map(n => ({n, name: g[n].slice().sort((x, y) => String(y.created_at).localeCompare(String(x.created_at)))[0].name, rem: wrem(g[n]), cnt: g[n].length})).sort((x, y) => x.name.localeCompare(y.name, 'ar'));
+  const tot = wrem(all);
+  return head(WK[k], `${ps.length} عميل`, {back: true, gear: false}) +
+    `<div class="bal" style="background:linear-gradient(135deg,#0e7c86,#16a5a0)"><small>إجمالي المتبقي</small><b>${tot < 0 ? '-' : ''}${fmt(Math.abs(tot))} ج</b></div>` +
+    (ps.length ? ps.map(p => `<button class="row" data-go="w/${k}/${encodeURIComponent(p.n)}"><span class="n">${esc(p.name)}<span class="d">${p.cnt} عملية</span></span><span class="c">${remHTML(p.rem)}</span></button>`).join('') : '<div class="empty">مفيش حاجة لسه. اضغط + عشان تضيف.</div>') +
     `<button class="fab" data-act="add-w">${svg('plus')}</button>` + nav('home');
 }
-function walletForm(e) {
+function walletForm(e, name) {
   const k = e ? e.kind : walletKind(); if (!k) return;
-  form(e ? 'تعديل' : 'إضافة', [{k: 'name', l: 'الاسم'}, {k: 'amount', l: 'المبلغ المستلم (جنيه)', m: 'decimal'}], e || {},
-    o => { const a = num(o.amount); if (a <= 0) throw new Error('المبلغ لازم يكون أكبر من صفر'); const row = {name: needName(o), amount: a}; return e ? mut('wallet', 'upd', row, e.id) : mut('wallet', 'ins', Object.assign({kind: k}, row)); },
+  const vals = e ? {name: e.name, amount: e.amount, op: e.op || 'deposit'} : {name: name || '', op: 'deposit'};
+  form(e ? 'تعديل' : 'إضافة عملية', [{k: 'name', l: 'اسم العميل'}, {k: 'op', l: 'نوع العملية', t: 'sel', o: [['deposit', 'إيداع'], ['withdraw', 'سحب']]}, {k: 'amount', l: 'المبلغ (جنيه)', m: 'decimal'}], vals,
+    async o => { const a = num(o.amount); if (a <= 0) throw new Error('المبلغ لازم يكون أكبر من صفر'); const row = {name: needName(o), amount: a, op: o.op === 'withdraw' ? 'withdraw' : 'deposit'};
+      try { await (e ? mut('wallet', 'upd', row, e.id) : mut('wallet', 'ins', Object.assign({kind: k}, row))); }
+      catch (x) { if (/\bop\b/.test(String(x && x.message)) && /column|schema/i.test(String(x && x.message))) throw new Error('لازم تشغّل خطوة SQL الأول من Supabase'); throw x; } },
     e && (async () => { await mut('wallet', 'del', null, e.id); }));
 }
 function customerForm(c) {
@@ -471,19 +569,21 @@ function loginScreen() {
   $('#app').innerHTML = `<div class="lw"><div class="lc"><div class="lgo">م</div><div class="lt">مطبعتي</div><div class="lh">سجّل دخولك عشان تبدأ</div>
   <form id="lf"><input class="f1" name="email" type="text" placeholder="اسم المستخدم" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false">
   <input class="f2" name="pw" type="password" placeholder="كلمة السر" autocomplete="current-password"><button class="lb" type="submit">دخول</button><div class="err" id="ferr"></div></form>
-  <div class="forgot">نسيت كلمة السر؟</div>
+  <div class="forgot" id="fgl">نسيت كلمة السر؟</div>
   <div class="dots"><b style="background:var(--t)"></b><b style="background:var(--p)"></b><b style="background:var(--y)"></b><b style="background:var(--k)"></b></div></div></div>`;
   const lfm = $('#lf');
   lfm.addEventListener('focusin', () => document.body.classList.add('typing'));
   lfm.addEventListener('focusout', () => setTimeout(() => { if (!document.activeElement || !document.activeElement.matches('#lf input')) document.body.classList.remove('typing'); }, 150));
+  $('#fgl').onclick = forgotBox;
   $('#lf').onsubmit = async e => {
     e.preventDefault();
     const o = Object.fromEntries(new FormData(e.target));
+    if (!String(o.email || '').trim() || !o.pw) { $('#ferr').textContent = 'برجاء إدخال اسم المستخدم وكلمة السر'; $('#ferr').style.marginTop = '10px'; return; }
     const b = e.target.querySelector('.lb'); b.disabled = true; document.body.classList.add('go');
-    const em = resolveUser(o.email);
-    if (!em) { document.body.classList.remove('go'); $('#ferr').textContent = 'اسم المستخدم أو كلمة السر غلط'; $('#ferr').style.marginTop = '10px'; b.disabled = false; return; }
+    const em = await resolveLogin(o.email);
+    if (!em) { document.body.classList.remove('go'); $('#ferr').textContent = 'الاسم أو الرقم السري خطأ'; $('#ferr').style.marginTop = '10px'; b.disabled = false; return; }
     const {error} = await sb.auth.signInWithPassword({email: em, password: o.pw});
-    if (error) { document.body.classList.remove('go'); $('#ferr').textContent = errMsg(error); $('#ferr').style.marginTop = '10px'; b.disabled = false; return; }
+    if (error) { document.body.classList.remove('go'); $('#ferr').textContent = loginMsg(error); $('#ferr').style.marginTop = '10px'; b.disabled = false; return; }
     GREET_T0 = Date.now();
     boot();
   };
@@ -522,7 +622,7 @@ document.addEventListener('click', async e => {
   else if (a === 'backup') backup();
   else if (a === 'refresh') { const before = JSON.stringify(S); try { await withTmo(loadAll(), 25000); } catch (x) { closeModal(); tell('تعذر التحديث: ' + errMsg(x)); return; } render(); closeModal(); tell(JSON.stringify(S) === before ? 'لا يوجد تحديث، البيانات محدثة' : 'تم تحديث البيانات'); }
   else if (a === 'logout') { { await sb.auth.signOut(); try { localStorage.removeItem(CK); } catch (e) {} closeModal(); boot(); } }
-  else if (a === 'add-w') walletForm();
+  else if (a === 'add-w') walletForm(null, el.dataset.name);
   else if (a === 'edit-w') walletForm((S.wallet || []).find(x => x.id === id));
   else if (a === 'add-item') itemForm();
   else if (a === 'edit-item') itemForm(S.items.find(x => x.id === id));
@@ -563,7 +663,7 @@ function demoData() {
   const ledger = L.map((e, i) => ({id: 'l' + i, customer_id: e[0], kind: e[1], amount: e[2], note: e[3], entry_date: e[4], created_at: e[4] + 'T10:0' + i}));
   const items = [['كارت شخصي (1000 كارت)', 350, 'ورق كوشيه 300 جم، وش وظهر'], ['بانر فينيل', 85, 'سعر المتر'], ['فلاير A5', 600, '1000 فلاير، كوشيه 150 جم'], ['ستيكر قص', 120, 'سعر المتر'], ['علب كرتون مطبوعة', 14, 'سعر العلبة، من 500']].map((x, i) => ({id: 'i' + i, name: x[0], price: x[1], details: x[2], created_at: '2026-11-0' + (i + 1)}));
   const places = [['ورشة الأوفست - م. حسن', 'صيانة ماكينات الأوفست', '01011112222', 'المنطقة الصناعية'], ['مركز الأمانة', 'قطع غيار وطابعات', '01122223333', 'وسط البلد'], ['الفني سامي', 'سكاكين وقص', '01233334444', 'برج العرب']].map((x, i) => ({id: 'p' + i, name: x[0], service: x[1], phone: x[2], address: x[3], notes: '', created_at: '2026-11-0' + (i + 1)}));
-  const wallet = [['vodafone', 'محمد سعيد', 1500], ['vodafone', 'أحمد محمود', 800], ['vodafone', 'شركة الأمل', 2500], ['instapay', 'مكتبة النور', 3000], ['instapay', 'صيدلية الشفاء', 1200]].map((w, i) => ({id: 'w' + i, kind: w[0], name: w[1], amount: w[2], created_at: '2026-11-2' + i + 'T10:00:00Z'}));
+  const wallet = [['vodafone', 'محمد سعيد', 1500, 'deposit'], ['vodafone', 'محمد سعيد', 400, 'withdraw'], ['vodafone', 'أحمد محمود', 800, 'deposit'], ['vodafone', 'شركة الأمل', 2500, 'deposit'], ['vodafone', 'شركة الأمل', 2900, 'withdraw'], ['instapay', 'مكتبة النور', 3000, 'deposit'], ['instapay', 'صيدلية الشفاء', 1200, 'deposit']].map((w, i) => ({id: 'w' + i, kind: w[0], name: w[1], amount: w[2], op: w[3], created_at: '2026-11-2' + i + 'T10:00:00Z'}));
   return {items, customers, places, ledger, wallet};
 }
 /* hard watchdog: the UI must always appear (home from cache, otherwise login) */
