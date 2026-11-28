@@ -122,7 +122,11 @@ window.onerror=function(m,u,l){m=String(m);var f=String(u).split('/').pop();if(/
 <script>if(!window.supabase)document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>')</script>
 <script>
 /* مطبعتي v1.0.45 */
-const APP_VERSION = '1.0.45';
+const APP_VERSION = '1.0.49';
+let SHOWV = APP_VERSION; try { SHOWV = localStorage.getItem('mt_shownv') || APP_VERSION; } catch (e) {}
+function paintV() { document.querySelectorAll('.mtv').forEach(e => { if (e.textContent !== SHOWV) e.textContent = SHOWV; }); }
+function readV() { if (!navigator.onLine) return; fetch('version.json?t=' + Date.now(), { cache: 'no-store' }).then(r => r.json()).then(j => { if (j && j.version) { SHOWV = String(j.version); try { localStorage.setItem('mt_shownv', SHOWV); } catch (e) {} paintV(); } }).catch(() => {}); }
+setTimeout(readV, 0);
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt = n => Number(n || 0).toLocaleString('en-US', {maximumFractionDigits: 2});
@@ -544,8 +548,9 @@ function settings() {
   <button class="btn" data-act="backup">نسخة احتياطية Excel</button>
   <div class="sub" style="text-align:center;margin:6px 0 14px">آخر نسخة: ${lb ? new Date(lb).toLocaleDateString('ar-EG') : 'لسه ماعملتش'}</div>
   <button class="btn w" data-act="refresh">تحديث البيانات</button>
+  <button class="btn w" data-act="upd">فحص التحديثات</button>
   ${DEMO ? '' : '<button class="btn del" data-act="logout">تسجيل خروج</button>'}
-  <div class="sub" style="text-align:center;margin-top:14px">مطبعتي · نسخة ${APP_VERSION}</div></div>`;
+  <div class="sub" style="text-align:center;margin-top:14px">مطبعتي · نسخة <span class="mtv">${SHOWV}</span></div></div>`;
   $('#modal').classList.add('on');
 }
 
@@ -620,6 +625,7 @@ document.addEventListener('click', async e => {
   else if (a === 'back') { if (history.length > 1) history.back(); else location.hash = '#/customers'; }
   else if (a === 'settings') settings();
   else if (a === 'backup') backup();
+  else if (a === 'upd') { const o = el.textContent; el.textContent = 'جاري الفحص...'; el.disabled = true; const r = window.mtCheckUpd ? await window.mtCheckUpd() : 'error'; if (r === 'updating') { el.textContent = 'جاري التحديث...'; } else { el.disabled = false; el.textContent = r === 'latest' ? 'انت على آخر نسخة ✓' : r === 'offline' ? 'مفيش اتصال بالإنترنت' : r === 'error' ? 'تعذر الفحص' : o; setTimeout(() => { if (el.isConnected) el.textContent = o; }, 2500); } }
   else if (a === 'refresh') { const before = JSON.stringify(S); try { await withTmo(loadAll(), 25000); } catch (x) { closeModal(); tell('تعذر التحديث: ' + errMsg(x)); return; } render(); closeModal(); tell(JSON.stringify(S) === before ? 'لا يوجد تحديث، البيانات محدثة' : 'تم تحديث البيانات'); }
   else if (a === 'logout') { { await sb.auth.signOut(); try { localStorage.removeItem(CK); } catch (e) {} closeModal(); boot(); } }
   else if (a === 'add-w') walletForm(null, el.dataset.name);
@@ -640,6 +646,31 @@ window.addEventListener('hashchange', () => { Q = ''; if (READY || DEMO) render(
 if ('serviceWorker' in navigator && !DEMO && location.protocol.startsWith('http')) {
   const had = !!navigator.serviceWorker.controller;
   navigator.serviceWorker.register('sw.js').catch(() => {});
+  let updBusy = false;
+  const busyUi = () => { const m = document.getElementById('modal'), a = document.activeElement; return document.body.classList.contains('typing') || (m && m.classList.contains('on') && !document.querySelector('#modal .sheet [data-act=upd]')) || (a && a.matches && a.matches('input,textarea,select')); };
+  const chkUpd = async manual => {
+    if (updBusy) return 'busy';
+    if (!manual && (!navigator.onLine || busyUi())) return 'skip';
+    if (manual && !navigator.onLine) return 'offline';
+    updBusy = true;
+    try {
+      const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
+      const v = (await r.json()).version;
+      if (!v || v === APP_VERSION) return 'latest';
+      const k = 'mt_upd_try';
+      let t = {}; try { t = JSON.parse(localStorage.getItem(k) || '{}'); } catch (e) {}
+      if (!manual && t.v === v && Date.now() - t.at < 120000) return 'skip';
+      try { localStorage.setItem(k, JSON.stringify({ v: v, at: Date.now() })); } catch (e) {}
+      await Promise.all(['index.html', 'sw.js'].map(f => fetch(f + '?t=' + Date.now(), { cache: 'reload' }).catch(() => {})));
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(g => g.unregister()));
+      const ks = await caches.keys();
+      await Promise.all(ks.map(x => caches.delete(x)));
+      location.reload();
+      return 'updating';
+    } catch (e) { return 'error'; } finally { updBusy = false; }
+  };
+  window.mtCheckUpd = () => chkUpd(true);
   let hiddenAt = 0, resBusy = false;
 document.addEventListener('visibilitychange', async () => {
   if (document.hidden) { hiddenAt = Date.now(); return; }
