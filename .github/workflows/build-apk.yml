@@ -33,6 +33,8 @@ steps:
 
   - name: Create Android project
     run: |
+      set -euo pipefail
+
       mkdir -p build/www
       cp index.html app.js sw.js supabase.min.js manifest.webmanifest icon-192.png icon-512.png version.json build/www/
 
